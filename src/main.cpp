@@ -7,7 +7,7 @@
 void setup() {
   Serial.begin(115200);
   pinMode(LED_PIN, OUTPUT);
-  Serial.printf("Blink started on GPIO%d, PSRAM: %u bytes\n", LED_PIN, ESP.getPsramSize());
+  Serial.printf("Blink started on GPIO%d, PSRAM: %lu bytes\n", LED_PIN, (unsigned long)ESP.getPsramSize());
 }
 
 void loop() {
