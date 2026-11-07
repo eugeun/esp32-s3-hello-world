@@ -1,6 +1,6 @@
 # ESP32-S3 (Freenove WROOM) — PlatformIO CLI wrapper
 ENV  ?= freenove_s3
-PIO  ?= pio
+PIO  ?= $(shell command -v pio || echo $(HOME)/.platformio/penv/bin/pio)
 PORT ?=            # optional override: make upload PORT=/dev/tty.xxx
 
 PORT_ARG := $(if $(PORT),--upload-port $(PORT),)
