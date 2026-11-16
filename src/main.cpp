@@ -3,6 +3,10 @@
 #define LED_PIN 2
 #define BUTTON_PIN 13
 
+void reverseGPIO(int pin) {
+  digitalWrite(pin, ! digitalRead(pin));
+}
+
 void setup() {
   Serial.begin(115200);
   pinMode(LED_PIN, OUTPUT);
@@ -12,10 +16,12 @@ void setup() {
 
 void loop() {
   if (digitalRead(BUTTON_PIN) == LOW) {
-    digitalWrite(LED_PIN, HIGH);
-    Serial.println("LED ON");
-  } else {
-    digitalWrite(LED_PIN, LOW);
-    Serial.println("LED OFF");
+    delay(20);
+    if (digitalRead(BUTTON_PIN) == LOW) {
+      reverseGPIO(LED_PIN);
+    }
+    while(digitalRead(BUTTON_PIN) == LOW);
+    delay(20);
+    //while(digitalRead(BUTTON_PIN) == LOW);
   }
 }
