@@ -12,13 +12,13 @@ void reverseBreath(int pin) {
   if (lastState == 0) {
     for(int i=0; i<255; i++) {
       ledcWrite(LED_PIN, i);
-      delay(10);
+      delay(5);
     }
     lastState = 1;
   } else {
     for(int i=254; i>-1; i--) {
       ledcWrite(LED_PIN, i);
-      delay(10);
+      delay(5);
     }
     lastState = 0;
 
@@ -27,7 +27,6 @@ void reverseBreath(int pin) {
 
 void setup() {
   Serial.begin(115200);
-  pinMode(LED_PIN, OUTPUT);
   pinMode(BUTTON_PIN, INPUT);
   ledcAttachChannel(LED_PIN, FRQ, PWM_BIT, CHN);
   Serial.printf("Blink started on GPIO%d, PSRAM: %lu bytes\n", LED_PIN, (unsigned long)ESP.getPsramSize());
