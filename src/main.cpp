@@ -4,9 +4,10 @@
 #define BUTTON_PIN 13
 #define CHN 0
 #define FRQ 1000
-#define PWM_BIT 8
+#define PWM_BIT 12
 
 const int MAX_DUTY = (1 << PWM_BIT) - 1;
+const int FADE_STEPS = 255;  // brightness range, independent of PWM resolution
 const unsigned long DEBOUNCE_MS = 30;
 const unsigned long FADE_STEP_MS = 10;
 
@@ -16,6 +17,11 @@ unsigned long lastDebounce = 0;
 int target = 0;
 int brightness = 0;
 unsigned long lastStep = 0;
+
+// Gamma 2 curve: maps linear brightness (0..FADE_STEPS) to PWM duty (0..MAX_DUTY)
+int toDuty(int b) {
+  return (b * b * MAX_DUTY) / (FADE_STEPS * FADE_STEPS);
+}
 
 void setup() {
   Serial.begin(115200);
@@ -33,13 +39,15 @@ void loop() {
     lastButton = reading;
     if (lastButton == LOW) {
       Serial.println("pressed");
-      target = (target == 0) ? MAX_DUTY : 0;
+      target = (target == 0) ? FADE_STEPS : 0;
     }
   }
 
   if (now - lastStep >= FADE_STEP_MS) {
     lastStep = now;
-    if (brightness < target) ledcWrite(LED_PIN, ++brightness);
-    else if (brightness > target) ledcWrite(LED_PIN, --brightness);
+    if (brightness != target) {
+      brightness += (brightness < target) ? 1 : -1;
+      ledcWrite(LED_PIN, toDuty(brightness));
+    }
   }
 }
