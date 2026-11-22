@@ -1,0 +1,6 @@
+{
+    "include": ["circuit"],
+    "exclude": ["**/.venv"],
+    "venvPath": "circuit",
+    "venv": ".venv"
+}
