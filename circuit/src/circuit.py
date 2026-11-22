@@ -1,5 +1,14 @@
+# schemdraw's type hints make .at() return the base Element, whose up()/down()/... take no
+# length argument, although the real classes accept one. Silence that false positive.
+# pyright: reportCallIssue=false
+from pathlib import Path
+
 import schemdraw
 import schemdraw.elements as elm
+
+# Output goes to ../assets/lamp.png, regardless of the current directory
+OUTPUT = Path(__file__).resolve().parent.parent / 'assets' / 'lamp.png'
+OUTPUT.parent.mkdir(exist_ok=True)
 
 left_names  = ['3.3V','EN','4','5','6','7','15','16','17','18','8','3','46','9','10','11','12','13','14','5V']
 right_names = ['TX','RX','1','2','42','41','40','39','38','37','36','35','0','45','48','47','21','20','19','GND']
@@ -11,7 +20,7 @@ pins += [elm.IcPin(name='', side='top', anchorname='T5V'),
          elm.IcPin(name='', side='top', anchorname='TEXT'),
          elm.IcPin(name='GND', side='bottom', anchorname='BGND')]
 
-with schemdraw.Drawing(file='lamp.png', dpi=130, show=False):
+with schemdraw.Drawing(file=str(OUTPUT), dpi=130, show=False):
     esp = elm.Ic(pins=pins, pinspacing=0.6, size=(8, 12.6), leadlen=0.8, lblsize=11,
                  label='ESP32-S3 WROOM\nGPIO Extension')
 

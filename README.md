@@ -2,6 +2,10 @@
 
 Arduino-framework firmware for the Freenove ESP32-S3 WROOM board (8MB flash, QIO/OPI PSRAM), built with PlatformIO and driven by a Makefile.
 
+## Circuit
+
+The wiring schematic (GPIO2 → R1 → LED, button on GPIO13 with a pull-up) lives in [circuit/](circuit/). See [circuit/README.md](circuit/README.md) for the diagram and for how to regenerate the image from its Python source.
+
 ## Setup on a new workstation
 
 1. Install PlatformIO CLI: `make setup` (or install the PlatformIO IDE extension in VSCode; the Makefile finds `~/.platformio/penv/bin/pio` automatically).
