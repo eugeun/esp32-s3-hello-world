@@ -6,38 +6,40 @@
 #define FRQ 1000
 #define PWM_BIT 8
 
-int lastButtonState = HIGH;
-unsigned long lastChangeTimeStamp = 0;
-int debounceTimeout = 30;
+const int MAX_DUTY = (1 << PWM_BIT) - 1;
+const unsigned long DEBOUNCE_MS = 30;
+const unsigned long FADE_STEP_MS = 10;
+
+int lastButton = HIGH;
+unsigned long lastDebounce = 0;
 
 int target = 0;
 int brightness = 0;
-int maxIteration = 255;
-int lastStep = 0;
+unsigned long lastStep = 0;
 
 void setup() {
   Serial.begin(115200);
   pinMode(BUTTON_PIN, INPUT);
   ledcAttachChannel(LED_PIN, FRQ, PWM_BIT, CHN);
-  Serial.printf("Blink started on GPIO%d, PSRAM: %lu bytes\n", LED_PIN, (unsigned long)ESP.getPsramSize());
+  Serial.printf("Lamp started on GPIO%d, button on GPIO%d\n", LED_PIN, BUTTON_PIN);
 }
 
 void loop() {
-  int currentButtonState = digitalRead(BUTTON_PIN);
-  if (currentButtonState != lastButtonState) {
-    unsigned long now = millis();
-    if (now - lastChangeTimeStamp > debounceTimeout) {
-      lastButtonState = currentButtonState;
-      lastChangeTimeStamp = now;
-      if (lastButtonState == LOW) {
-        Serial.printf("pressed\n");
-        target = (target == 0) ? 255 : 0;
-      }
+  unsigned long now = millis();
+
+  int reading = digitalRead(BUTTON_PIN);
+  if (reading != lastButton && now - lastDebounce > DEBOUNCE_MS) {
+    lastDebounce = now;
+    lastButton = reading;
+    if (lastButton == LOW) {
+      Serial.println("pressed");
+      target = (target == 0) ? MAX_DUTY : 0;
     }
   }
-  if (millis() - lastStep >= 10) {
-    lastStep = millis();
+
+  if (now - lastStep >= FADE_STEP_MS) {
+    lastStep = now;
     if (brightness < target) ledcWrite(LED_PIN, ++brightness);
     else if (brightness > target) ledcWrite(LED_PIN, --brightness);
-  } 
+  }
 }
