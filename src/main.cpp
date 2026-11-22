@@ -6,24 +6,14 @@
 #define FRQ 1000
 #define PWM_BIT 8
 
-int lastState = 0;
+int lastButtonState = HIGH;
+unsigned long lastChangeTimeStamp = 0;
+int debounceTimeout = 30;
 
-void reverseBreath(int pin) {
-  if (lastState == 0) {
-    for(int i=0; i<255; i++) {
-      ledcWrite(LED_PIN, i);
-      delay(5);
-    }
-    lastState = 1;
-  } else {
-    for(int i=254; i>-1; i--) {
-      ledcWrite(LED_PIN, i);
-      delay(5);
-    }
-    lastState = 0;
-
-  }
-}
+int target = 0;
+int brightness = 0;
+int maxIteration = 255;
+int lastStep = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -33,12 +23,21 @@ void setup() {
 }
 
 void loop() {
-  if (digitalRead(BUTTON_PIN) == LOW) {
-    delay(20);
-    if (digitalRead(BUTTON_PIN) == LOW) {
-      reverseBreath(LED_PIN);
+  int currentButtonState = digitalRead(BUTTON_PIN);
+  if (currentButtonState != lastButtonState) {
+    unsigned long now = millis();
+    if (now - lastChangeTimeStamp > debounceTimeout) {
+      lastButtonState = currentButtonState;
+      lastChangeTimeStamp = now;
+      if (lastButtonState == LOW) {
+        Serial.printf("pressed\n");
+        target = (target == 0) ? 255 : 0;
+      }
     }
-    while(digitalRead(BUTTON_PIN) == LOW);
-    delay(20);
   }
+  if (millis() - lastStep >= 10) {
+    lastStep = millis();
+    if (brightness < target) ledcWrite(LED_PIN, ++brightness);
+    else if (brightness > target) ledcWrite(LED_PIN, --brightness);
+  } 
 }
